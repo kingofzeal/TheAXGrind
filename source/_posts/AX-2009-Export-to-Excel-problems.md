@@ -1,6 +1,10 @@
 title: 'AX 2009: Export to Excel problems'
 date: 2013-10-01 09:00:00
 tags:
+ - X++
+ - Excel
+categories: 
+ - AX 2009
 ---
 We have recently seen an issue with the Export to Excel feature of AX 2009, where a stray double quotation mark in the grid will cause all subsequent fields to be offset. Instead of getting nicely formatted rows and columns, we had a few well-formatted rows, and some other rows that weren't so nicely formatted. This is also shown in one or two other places around there internet (such as [http://community.dynamics.com/ax/f/33/t/102643.aspx](http://community.dynamics.com/ax/f/33/t/102643.aspx)), but as much as I looked I could not find a solution. We had looked at this problem earlier, as many of our part number include double quotes to represent inches. Previously, we modified the itemName method on the InventTable to replace double quotes with single quotes, as that would not break Excel and was an easy fix. However, we recently discovered that many other user fields were starting to have double quotes in them, and we needed a way to address all of them.
 
