@@ -62,10 +62,10 @@ sidebar:
         #     title: global.github
         #     url: https://github.com/
         #     icon: github
-         stack_overflow:
-             title: global.stack_overflow
-             url: http://stackoverflow.com/users/1088711/kingofzeal
-             icon: stack-overflow
+        # stack_overflow:
+        #     title: global.stack_overflow
+        #     url: http://stackoverflow.com/users/1088711/kingofzeal
+        #     icon: stack-overflow
         # twitter:
         #     title: global.twitter
         #     url: https://twitter.com/
