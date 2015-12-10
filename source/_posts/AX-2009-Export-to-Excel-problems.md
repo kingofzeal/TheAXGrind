@@ -23,7 +23,7 @@ The last option, to modify the clipboard data after it has already been generate
 
 Within the performPushAndFormatting method, before any of the Excel work begins, I added the following code:
 
-```CSharp SysGridExportToExcel.performPushAndFormatting
+```axapta SysGridExportToExcel.performPushAndFormatting
 TextBuffer buffer = new TextBuffer();
 System.Text.RegularExpressions.Regex regex;
 str cleanedText;

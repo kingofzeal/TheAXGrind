@@ -62,7 +62,7 @@ Start AX Server: StartAXServers.ps1
 
 Each UpdateAxDatabase.bat file looks like this:
 
-```BASH UpdateAxDatabase.bat
+```dos UpdateAxDatabase.bat
 @echo off
 REM local resources
 set sqlServerHost=[Destination SQL Server Name]

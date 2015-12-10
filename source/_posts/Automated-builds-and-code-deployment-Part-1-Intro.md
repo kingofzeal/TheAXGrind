@@ -28,21 +28,18 @@ The first thing you can see is that the development is cyclical, which is best p
 
 As for the actual makeup of the system, I am using a total of 5 servers. More stringent requirements may insist on more (I've seen as many as 8), and you can do it with as few as 4 by eliminating the dedicated Build server and combining the functionality with the User Acceptance Testing, but it would require a little more management to ensure procedures happen in the correct order. A 5 server system eliminates many of those problems with minimal resource requirements.
 
-I've also included how code is transferred between each of the environments:
+I've also included how code is transferred between each of the environments.
 
-- XPO
-
+#### XPO
 Transfer files by exporting the raw XPO from the source system, and importing it into the destination system. IDs are generally not exported or imported. This method should only be used prior to the build taking place. A database sync and full compilation are necessary for all the changes to take effect.
 
-- Automatic Layers
-
+#### Automatic Layers
 The fully compiled set of layer and label files are moved automatically from the source system to the destination system. This can take place on a schedule or when triggered by a system event. Unless a temporary storage location is used, both environments must be taken offline. When the system is brought online, only a database sync is necessary.
 
-- Manual Layers
-
+#### Manual Layers
 The fully compiled set of layer and label files are automatically moved from the source system to the destination system. The transfer only occurs on a specific, user-initiated event. Unless a temporary storage location is used, both environments must be taken offline. When the system is brought online, only a database sync is necessary.
 
- 
+&nbsp;
 
 As you can see, the entire system is not completely automated. At key points there is human interaction required. This can be something as simple as running a batch file, which triggers the code push to the next environment. However, depending on your programming skills and specific business requirements this can be any human-based event. In either case, the actual transfer of code (including XPOs) should be completely automated whenever possible. 
 
@@ -76,6 +73,6 @@ To preserve previous updates, once Staging has been deployed to Production, the 
 
 To keep the continuity with multiple projects in development, the Build server should ONLY be updated immediately after Staging is deployed to Production, and all still-in-process projects should be re-imported to the Build server as soon as possible. If you do automate the XPO transfer to the Build environment, this becomes much easier to handle.
 
-----------
+&nbsp;
 
 I hope that this post can help you to automate code production within your own AX environment. I know there are a lot of points left out, but I do hope to address those points in future posts. If you have any questions regarding any point, please let me know below.

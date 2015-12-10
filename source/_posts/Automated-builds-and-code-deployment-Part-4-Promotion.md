@@ -61,7 +61,7 @@ This means the build agent that is running this will automatically extract all t
 ### Stop AX Server Process
 Because we will be manipulating the server binaries, our first step is to shut down the AX server (or servers). Originally, we used a batch script for this step. However, because we cannot specify the timeout, we would sometimes run into issues where the service did not finish shutting down or starting up before the rest of the process occurred. So instead we are using a simple PowerShell script:
  
-```CSharp StopAxServers.ps1
+```powershell StopAxServers.ps1
 stop-service -inputobject $(get-service -ComputerName "[AOS Server 2]" -DisplayName "Dynamics AX Object Server 5.0$*") -WarningAction SilentlyContinue
 stop-service -inputobject $(get-service -ComputerName "[AOS Server 1]" -DisplayName "Dynamics AX Object Server 5.0$*") -WarningAction SilentlyContinue
 stop-service -inputobject $(get-service -ComputerName "[AX Load Balancer]" -DisplayName "Dynamics AX Object Server 5.0$*") -WarningAction SilentlyContinue
@@ -73,7 +73,7 @@ As you can see, we are stopping each process sequentially and in reverse order. 
 ### Copy Build Files
 As mentioned before, the files from the build are automatically extracted to a folder that we can reference. We cannot just extract them to the AX Server folder because the extraction process occurs before the first defined step, meaning the files will be in use. Instead, we will just copy them there now that the server is offline:
  
-```BASH CopyBuildFiles.bat
+```dos CopyBuildFiles.bat
 @echo off
 REM Resources
 set fileSource="..\..\AX Build Files\*.*"
@@ -92,7 +92,7 @@ The AX Build Files folder will be in the root build directory, which is two leve
 ### Remove AOS temp/cache files
 This step is another simple script which removes the now old temp and cache files the AX server uses to help make things run faster. If they aren't removed, the server may continue to use the old code, which could cause issues for uses. These files will be re-built with the new codebase once the first AX server starts up.
  
-```BASH RemoveTempFiles.bat
+```dos RemoveTempFiles.bat
 @echo off
 REM Resources
 set fileLoc=\\[server name]\DynamicsAx1
@@ -125,7 +125,7 @@ This information is stored in the database on the SysEnvironment table, and sinc
  
 In this case, the script takes a number, which represents the build ID (not to be confused with the build number). This is passed into the script from the TeamCity configuration.
  
-```CSharp CopyVersionControlInfo.ps1
+```powershell CopyVersionControlInfo.ps1
 param([Int32]$buildId)
  
 Write-Host "##teamcity[message text='Loading build information for $buildId' status='NORMAL']"
@@ -201,7 +201,7 @@ The biggest risk with this setup is if you need to roll back Build before a prod
 ### Start AX Server Process
 Now that all the database maintenance has been completed, we start up the AX processes again:
  
-```CSharp StartAxServers.ps1
+```powershell StartAxServers.ps1
 start-service -inputobject $(get-service -ComputerName "[AX Load Balancer]" -DisplayName "Dynamics AX Object Server 5.0$*") -WarningAction SilentlyContinue
 start-service -inputobject $(get-service -ComputerName "[AOS Server 1]" -DisplayName "Dynamics AX Object Server 5.0$*") -WarningAction SilentlyContinue
 start-service -inputobject $(get-service -ComputerName "[AOS Server 2]" -DisplayName "Dynamics AX Object Server 5.0$*") -WarningAction SilentlyContinue

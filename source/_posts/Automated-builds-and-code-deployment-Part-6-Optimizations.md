@@ -32,7 +32,7 @@ We still have process-specific scripts, but those now only hold scripts that can
 
 Here is an example of a script we have converted from a command line to PowerShell:
 
-```
+```powershell
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$True)]
@@ -52,7 +52,7 @@ In this case, we are passing in a folder location (in our case, the network shar
 
 Here is another example where we can take advantage of advanced processing to allow the script to run for multiple types of environments:
 
-```
+```powershell
 #Note: default values may not work, as empty strings may be passed. 
 #  Such strings should be treated as if nothing was passed.
 [CmdletBinding()]
@@ -85,27 +85,26 @@ On the TeamCity side, this script would be configured as follows:
 
 ![](TeamCityNewScriptSetup.png)
 
-The %AosServer% in the script arguments section is a reference to a the configuration parameters of the build configuration:
-![](TeamCityParmSetup.png)
+The `%AosServer%` in the script arguments section is a reference to a the configuration parameters of the build configuration:
 
+![](TeamCityParmSetup.png)
 
 Ultimately, these parameters drive the behavior of the entire process (which is why some parameters, like SqlServer, reference other parameters - because for this environment they are the same). 
 
-
+&nbsp;
 Finally, now that all the scripts are effectively applicable to all environments, it makes templating each of main processes easy, since all the scripts will take parameters. The parameters don't need to have a value within the template, they only need to be defined - the configurations provide the actual values. You can see from the screenshot above that majority of the parameters are inherited from a template. We have the option to reset any of them to the default values (in this case, blank, as defined on the template), but we cannot delete them.
 
 Each of the configuration parameters is also configurable within TeamCity so a value must be provided. If no value is provided, the configuration will not execute. The nice side of configuring a template this way is spinning up a new process is as easy as clicking a button and filling in some values:
 
 ![](TeamCityTemplate.png)
 
- 
-
+&nbsp;
 From there, the only things you need to define are the triggers and dependencies, if you need more than those that are defined via the template. 
 
 Similar to the build scripts themselves, if there is a new process that needs to be added for each type of configuration (for example, a new step), we need only add it to the template, and it will automatically be added to all the configurations that inherit from that template.
 
  
-
+&nbsp;
 The goal of all this is to decrease the amount of maintenance that needs to be done when a change needs to be made. By standardizing the language of all the scripts, less overall knowledge is needed to manage them; if a script generates an error, we need only fix one version of the script instead of 5; if a process is missing a step, we need only change the template configuration instead of 3-4 build configurations. 
 
 Here are samples for the scripts we have (not including the SQL files). Note that you may not need all these files:
@@ -211,7 +210,6 @@ foreach ($server in $serverNameList)
 ```
 -------------------------------------------------------------------------------
 ```Powershell BackupProdSql.ps1
-
 $rootSourceLocation = "\\[Network location]"
 $dbBackupFileName   = "DBBackup.bak"
 $serverName         = "[Server Name]"

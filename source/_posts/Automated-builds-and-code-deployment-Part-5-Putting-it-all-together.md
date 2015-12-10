@@ -29,7 +29,7 @@ Some of our environments (most notably Staging) have a requirement to be updated
  
 The data update configuration only has one step: Backing up the production database. This is a simple PowerShell script:
 
-```CSharp BackupDatabase.ps1
+```powershell BackupDatabase.ps1
 $rootSourceLocation = "\\[Backup Network location]\"
 $dbBackupFileName   = "DBBackup.bak"
 $serverName         = "[AX SQL Server Name]"

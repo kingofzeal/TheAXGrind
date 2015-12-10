@@ -36,16 +36,16 @@ The actual AX build consists of 3 steps: Synchronize the Data Dictionary, compil
 
 AX already has built-in command line commands to help handle the Data Dictionary synchronization and the system compile. Both commands will automatically close AX when the process is complete. In addition, the system compile command automatically takes the compiler output and saves it to a file, for later analysis. However, the normal output file is an HTML file with embedded XML output from the tmpCompilerOutput table, which holds all the information you normally see on the compiler. Because the HTML file does not render properly on modern browsers (it only works on Internet Explorer 9 and earlier, and even then does not do all it should if you examine the source), I have opted to change the SysCompilerOutput class so it outputs directly to a .xml file with only the pure XML. This also makes it easier to parse the results. If you want to do the same, here's how:
 
-```CSharp SysCompilerOutput.classDeclaration
-Change
+```axapta SysCompilerOutput.classDeclaration
+//Change
 #define.compileAllFileName('\\AxCompileAll.html')
 
-To
+//To
 #define.compileAllFileName('\\AxCompileAll.xml')
 ```
 
-```CSharp SysCompilerOutput.xmlExport
-Comment out or remove the following lines:
+```axapta SysCompilerOutput.xmlExport
+//Comment out or remove the following lines:
 
 file.write(#htmlStart);
 file.write(#compileXmlStart + '\n');
@@ -62,12 +62,12 @@ The actual build configuration in TeamCity is rather simple, only 3 steps:
 ![](TeamCityBuildSteps.png)
 
 SynchronizeAx.bat:
-```BASH SynchronizeAx.bat
+```dos SynchronizeAx.bat
 ax32.exe -startupcmd=synchronize
 ```
 
 CompileAx.bat:
-```BASH CompileAx.bat
+```dos CompileAx.bat
 ax32.exe -startupcmd=compileall_+
 ```
 
@@ -78,7 +78,7 @@ ax32.exe -startupcmd=compileall_+
 The script source allows the script to run, and returns the error code from that script if there is any.
 
 ParseCompilerResults.ps1 looks like this:
-```CSharp ParseCompilerResults.ps1 
+```powershell ParseCompilerResults.ps1 
 trap
 {
     # On any thrown error, return with a non-zero exit code
@@ -139,7 +139,7 @@ The top of the script (before `[xml]$xml = Get-Content…`) sets a generic error
 It would also be wise to adjust the Build Failure conditions to include "an error message is logged by a build runner" and "build process exit code is not zero". You can define additional failure conditions as desired.
 
 Finally, we have artifact paths set as follows:
-```
+```makefile
 C:\Program Files\Microsoft Dynamics AX\50\Application\Appl\DynamicsAx1\*.ald => BuildFiles.zip
 C:\Program Files\Microsoft Dynamics AX\50\Application\Appl\DynamicsAx1\*.add => BuildFiles.zip
 C:\Program Files\Microsoft Dynamics AX\50\Application\Appl\DynamicsAx1\*.ahd => BuildFiles.zip

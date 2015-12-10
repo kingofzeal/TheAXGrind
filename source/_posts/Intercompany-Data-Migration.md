@@ -13,7 +13,7 @@ More recently, the directive came that this other company should no longer exist
 This put us in an interesting position: we now need to merge the data from one company into another company so users will only need to operate in one.
 
  
-
+&nbsp;
 We explored several options to move data from one side to another. The biggest benefit was that, because both companies are in AX 2009, we have the same database backend, and a majority of the settings are identical. During this exploration, we looked at several possible solutions: using the AX Data Import/Export tool, using Atlas, duplicating the records in SQL directly and updating the DataAreaId, and others. No solution seemed to have an ideal migration path: while some settings like parameters were the same between the companies, others like item groups and financial dimensions had diverged and did not have matching codes on both sides.
 
 This was most detrimental to the most promising solution, Atlas. Not only would we have to create an upload template or series of templates that holds the base data like sales orders and items, we would also have to have supplementary templates to handle dependent information and explicitly add all the missing information prior to the main import. This ends up being a very tedious process, where even one missing entry at any point could cause the entire process to fail. Additionally, because we were going to have a hard cutoff of when the other company would stop being used, we would have to monitor those dependencies until just prior to the import to make sure no new information was added.
@@ -21,7 +21,7 @@ This was most detrimental to the most promising solution, Atlas. Not only would 
 During all this, we also found a fatal fault in both the Atlas plan and the Data Import/Export tool: In a few cases, the amount of information we need to import is massive. Since both the import/export tool and Atlas are dependent on Excel to operate, we were running into stability and performance issues using them. Items (the InventTable) in particular caused Excel to outright freeze or even crash, rendering both solutions effectively useless.
 
  
-
+&nbsp;
 Being a developer, I began approaching it from a data-driven context. I had some requirements in mind when approaching it: 
 
  - The tool had to be simple to use. Since I would not have access to use it in the production environment, I could not rely on a ‘developer interface’. This would have to include a progress indicator as well.
@@ -47,6 +47,7 @@ During the process, we were also able to identify the information we wanted to i
 Because we already had Atlas templates to handle open customer and vendor balances, we opted to use those for balances. Everything else would be done using this new tool.
 
 In the end, this is what we ended up with:
+
 ![](DataMigrationTool.png)
 
 
@@ -60,7 +61,7 @@ To accomplish the data transfer, I created a supporting data copy class. Each me
 
 Here is an example of one of the methods:
 
-```CSharp
+```axapta
 void inventDim(InventDim srcRecord)
 {
     InventDim   dstRecord,
@@ -137,7 +138,7 @@ Needless to say, there is still a fair amount of overhead the way the data is co
 
 The only downside to the tool is portability. We cannot do something like this:
 
-```CSharp
+```axapta
 static void job1(Args _args)
 {
     CustTable   sourceRecord,
@@ -156,7 +157,7 @@ static void job1(Args _args)
 
 While this would be nice to have, and seems like it should work to copy all the fields from the source record to an empty buffer. However, this also copies fields like the RecId and DataAreaId; when you go to insert the record, a runtime error is thrown that the record already exists (which, based on those two fields, is does). Instead, the pattern needs to be:
 
-```
+```axapta
 static void job1(Args _args)
 {
     CustTable   sourceRecord,

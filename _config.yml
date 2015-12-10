@@ -12,7 +12,7 @@ timezone: America/Chicago
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://http://axgrind.azurewebsites.net/
+url: http://axgrind.azurewebsites.net/
 root: /
 permalink: :year/:month/:title/
 permalink_defaults:
@@ -63,8 +63,8 @@ pagination_dir: page
 # Extensions
 ## Plugins: http://hexo.io/plugins/
 ## Themes: http://hexo.io/themes/
-theme: tranquilpeak
-#theme: landscape
+#theme: tranquilpeak
+theme: landscape
 
 feed:
   type: atom

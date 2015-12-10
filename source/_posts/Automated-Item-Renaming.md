@@ -13,7 +13,7 @@ To help combat this, we've constructed a periodic task for renaming items. Simpl
 
 Here is what the process code looks like:
 
-```CSharp 
+```axapta 
 public void run()
 {
     System.Text.RegularExpressions.Regex            regex;
@@ -144,7 +144,7 @@ One of the challenges associated with this is validation and historical record k
 
 To combat this, we created another field on our queue table, `OrigItemId`, which is a string of the same size as `ItemId`, and added an edit method on the table:
 
-```CSharp
+```axapta
 public edit ItemId itemId(boolean _set, ItemId _itemId)
 {
     ;
@@ -163,7 +163,7 @@ public edit ItemId itemId(boolean _set, ItemId _itemId)
 
 We also had to update two other methods on the table to make everything work correctly:
 
-```CSharp
+```axapta
 public void update()
 {
     if (this.orig().ItemId != this.NewItemId &&
@@ -175,7 +175,8 @@ public void update()
     super();
 }
 ```
-```CSharp
+
+```axapta
 public void insert()
 {
     this.OrigItemId = this.ItemId;
