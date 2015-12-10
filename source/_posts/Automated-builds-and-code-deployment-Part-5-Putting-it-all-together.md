@@ -15,8 +15,8 @@ Read the other posts in this series:
 [Part 3 - Flowback](/2014/01/Automated-builds-and-code-deployment-Part-3-Flowback/)
 [Part 4 - Promotion](/2014/10/Automated-builds-and-code-deployment-Part-4-Promotion/)
 Part 5 - Putting it all together
-Part 6 - Optimizations
-Part 7 - Upgrades
+[Part 6 - Optimizations](/2014/12/Automated-builds-and-code-deployment-Part-6-Optimizations/)
+[Part 7 - Upgrades](/2015/12/Automated-builds-and-code-deployment-Part-7-Upgrades/)
 
 In our implementation, we use TeamCity to manage each of the individual processes. I've discussed how the system not only makes it easier to migrate code through a development process, but also how to update the systems earlier in the cycle (like Dev) to reflect Production without any manual intervention. Both of these tasks benefit by having the entire process pre-scripted, allowing for the smallest amount of downtime so users and developers alike can get back to work as quickly as possible.
  

@@ -13,10 +13,10 @@ Read the other posts in this series:
 [Part 1 - Intro](/2013/11/Automated-builds-and-code-deployment-Part-1-Intro/)
 [Part 2 - Build](/2013/12/Automated-builds-and-code-deployment-Part-2-Build/)
 Part 3 - Flowback
-Part 4 - Promotion
-Part 5 - Putting it all together
-Part 6 - Optimizations
-Part 7 - Upgrades
+[Part 4 - Promotion](/2014/10/Automated-builds-and-code-deployment-Part-4-Promotion/)
+[Part 5 - Putting it all together](/2014/10/Automated-builds-and-code-deployment-Part-5-Putting-it-all-together/)
+[Part 6 - Optimizations](/2014/12/Automated-builds-and-code-deployment-Part-6-Optimizations/)
+[Part 7 - Upgrades](/2015/12/Automated-builds-and-code-deployment-Part-7-Upgrades/)
 
 I'm going to skip what really should be my next post in the Automated Builds and Code Deployment series (which should be about how code is promoted from Dev -> Build -> UAT -> Staging -> Production), and instead write about the reverse process, which I will be referring to as flowback. 
 

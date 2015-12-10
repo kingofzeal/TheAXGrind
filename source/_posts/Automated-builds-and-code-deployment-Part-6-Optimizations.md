@@ -16,7 +16,7 @@ Read the other posts in this series:
 [Part 4 - Promotion](/2014/10/Automated-builds-and-code-deployment-Part-4-Promotion/)
 [Part 5 - Putting it all together](/2014/10/Automated-builds-and-code-deployment-Part-5-Putting-it-all-together/)
 Part 6 - Optimizations
-Part 7 - Upgrades
+[Part 7 - Upgrades](/2015/12/Automated-builds-and-code-deployment-Part-7-Upgrades/)
 
 Up until now I have only been discussing what it has taken to get a Lifecycle Management system in place for AX 2009. The system needs to be reliable and adaptable while providing a comprehensive set of automated tasks to allow changes to AX to be propagated correctly. And like most programming projects, it was approached as a "Let's get this in place so we have something as soon as we can". However, inefficiencies can and do add up, so now it's time to refactor our solution and make it more efficient.
 

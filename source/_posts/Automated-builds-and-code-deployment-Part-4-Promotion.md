@@ -14,9 +14,9 @@ Read the other posts in this series:
 [Part 2 - Build](/2013/12/Automated-builds-and-code-deployment-Part-2-Build/)
 [Part 3 - Flowback](/2014/01/Automated-builds-and-code-deployment-Part-3-Flowback/)
 Part 4 - Promotion
-Part 5 - Putting it all together
-Part 6 - Optimizations
-Part 7 - Upgrades
+[Part 5 - Putting it all together](/2014/10/Automated-builds-and-code-deployment-Part-5-Putting-it-all-together/)
+[Part 6 - Optimizations](/2014/12/Automated-builds-and-code-deployment-Part-6-Optimizations/)
+[Part 7 - Upgrades](/2015/12/Automated-builds-and-code-deployment-Part-7-Upgrades/)
 
 In this installment of the Automated Builds and Code Deployment series, I'm going to cover what is probably the most important component of the build process: Promotion.
  

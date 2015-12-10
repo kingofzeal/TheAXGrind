@@ -12,11 +12,11 @@ Read the other posts in this series:
 [Why Create an AX Build Server/Process?](/2013/10/Why-create-an-AX-build-server-process)
 [Part 1 - Intro](/2013/11/Automated-builds-and-code-deployment-Part-1-Intro/)
 Part 2 - Build
-Part 3 - Flowback
-Part 4 - Promotion
-Part 5 - Putting it all together
-Part 6 - Optimizations
-Part 7 - Upgrades
+[Part 3 - Flowback](/2014/01/Automated-builds-and-code-deployment-Part-3-Flowback/)
+[Part 4 - Promotion](/2014/10/Automated-builds-and-code-deployment-Part-4-Promotion/)
+[Part 5 - Putting it all together](/2014/10/Automated-builds-and-code-deployment-Part-5-Putting-it-all-together/)
+[Part 6 - Optimizations](/2014/12/Automated-builds-and-code-deployment-Part-6-Optimizations/)
+[Part 7 - Upgrades](/2015/12/Automated-builds-and-code-deployment-Part-7-Upgrades/)
 
 In this part of my Automated Build and Code Deployment series, I'll be going over one of the more critical aspects: the build itself. I'll outline exactly what happens during the build process, including code examples where necessary. The automation does require some changes to AX to help it run more efficiently. 
 

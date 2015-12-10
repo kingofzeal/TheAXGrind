@@ -5,7 +5,6 @@ tags:
 categories:
  - AX 2009
  - Data
- - Development
 ---
 Some time ago, my organization had the need to have a new company established in AX. The direction given to us was that this company was to have their own sets of books for tax and reporting purposes, but manufacturing would continue to be done within our primary company, which was facilitated by the AX Intercompany functionality.
 

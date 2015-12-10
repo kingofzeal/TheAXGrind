@@ -8,16 +8,14 @@ categories:
 ---
 Read the other posts in this series:
 [Why Create an AX Build Server/Process?](/2013/10/Why-create-an-AX-build-server-process)
-[Part 1 - Intro]
-[Part 2 - Build]
-[Part 3 - Flowback]
-[Part 4 - Promotion]
-[Part 5 - Putting it all together]
-[Part 6 - Optimizations]
-[Part 7 - Upgrades]
-
+Part 1 - Intro
+[Part 2 - Build](/2013/12/Automated-builds-and-code-deployment-Part-2-Build/)
+[Part 3 - Flowback](/2014/01/Automated-builds-and-code-deployment-Part-3-Flowback/)
+[Part 4 - Promotion](/2014/10/Automated-builds-and-code-deployment-Part-4-Promotion/)
+[Part 5 - Putting it all together](/2014/10/Automated-builds-and-code-deployment-Part-5-Putting-it-all-together/)
+[Part 6 - Optimizations](/2014/12/Automated-builds-and-code-deployment-Part-6-Optimizations/)
+[Part 7 - Upgrades](/2015/12/Automated-builds-and-code-deployment-Part-7-Upgrades/)
  
-
 As I've mentioned a couple times, I am pushing to create a system within our AX implementation which will automatically deploy code changes through to our production environment. Some parts of this system (like to our Production server) will be automatically deployed, while others (like to the Staging server) will require a manual approval before deployment. 
 
 In this post, I plan on outlining exactly how I will approach this kind of system, some of the considerations and reasoning behind some of my ideas. I am only going to cover this from a relatively high level; in a future post, I will give some actual code examples on how to accomplish the tasks outlined here. 
