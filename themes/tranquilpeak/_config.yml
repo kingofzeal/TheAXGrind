@@ -47,25 +47,25 @@ sidebar:
             title: global.archives
             url: /all-archives
             icon: archive
-        search:
-            title: global.search
-            url: /#search
-            icon: search
-            # `st-search-show-outputs` classes are used to open swiftype search window
-            class: st-search-show-outputs
-        about:
-            title: global.about
-            url: /#about
-            icon: question
+        #search:
+        #    title: global.search
+        #    url: /#search
+        #    icon: search
+        #    # `st-search-show-outputs` classes are used to open swiftype search window
+        #    class: st-search-show-outputs
+        #about:
+        #    title: global.about
+        #    url: /#about
+        #    icon: question
     author_links:
         # github:
         #     title: global.github
         #     url: https://github.com/
         #     icon: github
-        # stack_overflow:
-        #     title: global.stack_overflow
-        #     url: http://stackoverflow.com/users
-        #     icon: stack-overflow
+         stack_overflow:
+             title: global.stack_overflow
+             url: http://stackoverflow.com/users/1088711/kingofzeal
+             icon: stack-overflow
         # twitter:
         #     title: global.twitter
         #     url: https://twitter.com/
