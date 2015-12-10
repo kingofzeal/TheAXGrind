@@ -4,7 +4,6 @@ tags:
 categories:
  - AX 2009
  - Build Process
- - Development
 ---
 Read the other posts in this series:
 Why Create an AX Build Server/Process?

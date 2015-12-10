@@ -1,0 +1,850 @@
+﻿Exportfile for AOT version 1.0 or later
+Formatversion: 1
+
+***Element: CLS
+
+; Microsoft Dynamics AX Class: DataMigrationTool unloaded
+; --------------------------------------------------------------------------------
+  CLSVERSION 1
+  
+  CLASS #DataMigrationTool
+    Id 50891
+    PROPERTIES
+      Name                #DataMigrationTool
+      Extends             #RunBase
+      RunOn               #Called from
+    ENDPROPERTIES
+    
+    METHODS
+      Version: 3
+      SOURCE #classDeclaration
+        #class DataMigrationTool extends RunBase
+        #{
+        #    boolean             processItems,
+        #                        processCustomers,
+        #                        processVendors,
+        #                        processSalesOrders,
+        #                        processPurchaseOrders,
+        #                        processQuotes,
+        #                        createGeneralJournal;
+        #    FilePath            filePath,
+        #                        logFilePath;
+        #    dataAreaId          companySource,
+        #                        companyDestin;
+        #
+        #    DialogField         field_processItems,
+        #                        field_processCustomers,
+        #                        field_processVendors,
+        #                        field_processSalesOrders,
+        #                        field_processPurchaseOrders,
+        #                        field_processQuotes,
+        #                        field_createGeneralJournal,
+        #                        field_filePath,
+        #                        field_logFilePath,
+        #                        field_companySource,
+        #                        field_companyDestin;
+        #
+        #    SysExcelApplication excelApplication;
+        #    SysExcelWorksheets  excelWorksheets;
+        #
+        #    DataCopy            copy;
+        #
+        #    int                 itemCount,
+        #                        customerCount,
+        #                        vendorCount,
+        #                        salesOrderCount,
+        #                        purchaseOrderCount,
+        #                        quoteCount,
+        #                        moduleCount,
+        #                        totalCount;
+        #
+        #    #Define.EOF(COMVariantType::VT_EMPTY)
+        #
+        #    #Define.ItemSheetName("Items")
+        #    #Define.VendorSheetName("Vendors")
+        #    #Define.CustomerSheetName("Customers")
+        #    #Define.QuoteSheetName("Quotes")
+        #    #Define.SalesOrderSheetName("Sales Orders")
+        #    #Define.PurchaseOrderSheetName("Purchase Orders")
+        #
+        #    #Define.CurrentVersion(2)
+        #    #LocalMacro.CurrentList
+        #        filePath,
+        #        logFilePath,
+        #        companySource,
+        #        companyDestin
+        #    #EndMacro
+        #    #LocalMacro.Version1List
+        #        filePath,
+        #        companySource,
+        #        companyDestin
+        #    #EndMacro
+        #}
+      ENDSOURCE
+      SOURCE #countWorksheetItems
+        #private int countWorksheetItems(str worksheetName)
+        #{
+        #    SysExcelCells   cells = this.getExcelWorksheetData(worksheetName);
+        #    SysExcelCell    cell;
+        #    int             total;
+        #    COMVariantType  comType;
+        #    str             cellValue;
+        #    ;
+        #
+        #    cell = cells.item(1, 2);
+        #    cell.value(strfmt("=COUNTA(A:A)"));
+        #
+        #    cellValue = cell.value().toString();
+        #
+        #    total = str2int(strrem(substr(cellValue, 1, strscan(cellValue, " VT_R8", 1, strlen(cellValue))), ","));
+        #
+        #    return total;
+        #}
+      ENDSOURCE
+      SOURCE #createJournalEntry
+        #private void createJournalEntry(dataAreaId srcCompany, dataAreaId dstCompany, boolean reverseAmounts = false)
+        #{
+        #    NumberSeq           numberSeq;
+        #    LedgerJournalTable  ledgerJournalTable;
+        #    LedgerJournalTrans  ledgerJournalTrans;
+        #    LedgerTrans         ledgerTrans;
+        #    LedgerTable         ledgerTable;
+        #    Voucher             voucher;
+        #    Common              temp,
+        #                        temp2,
+        #                        temp3;
+        #    ;
+        #
+        #    numberSeq = NumberSeq::newGetNum(LedgerParameters::numRefJournalNum());
+        #
+        #    changecompany(dstCompany)
+        #    {
+        #        ttsbegin;
+        #        ledgerJournalTable.initValue();
+        #        ledgerJournalTable.JournalName      = "GenJrn";
+        #        ledgerJournalTable.JournalNum       = numberSeq.num();
+        #        ledgerJournalTable.VoucherSeries    = numberSeq.parmNumberSequenceCode();
+        #        ledgerJournalTable.Name             = ""; //Journal Name;
+        #        ledgerJournalTable.JournalType      = LedgerJournalType::Daily;
+        #        ledgerJournalTable.insert();
+        #        copy.writeLog(strfmt("Journal %1 in %2 created", ledgerJournalTable.JournalNum, dstCompany), "Journal");
+        #
+        #        voucher = NumberSeq::newGetNum(LedgerParameters::numRefJournalNum()).num();
+        #
+        #        changecompany(srcCompany)
+        #        {
+        #            while select AccountNum,
+        #                         TransDate,
+        #                         Voucher,
+        #                         Txt,
+        #                         AmountMST,
+        #                         JournalNum,
+        #                         Dimension
+        #                from ledgerTrans
+        #                join ledgerTable
+        #                where ledgerTable.AccountNum == ledgerTrans.AccountNum
+        #            {
+        #                if (srcCompany != dstCompany)
+        #                {
+        #                    temp  = Dimensions::find(SysDimension::Division,   ledgerTrans.Dimension[1]);
+        #                    temp2 = Dimensions::find(SysDimension::Department, ledgerTrans.Dimension[2]);
+        #                    temp3 = Dimensions::find(SysDimension::Purpose,    ledgerTrans.Dimension[3]);
+        #                }
+        #
+        #                changecompany(dstCompany)
+        #                {
+        #                    if (srcCompany != dstCompany)
+        #                    {
+        #                        copy.dimensions(temp);
+        #                        copy.dimensions(temp2);
+        #                        copy.dimensions(temp3);
+        #                    }
+        #
+        #                    ledgerJournalTrans.initValue();
+        #                    ledgerJournalTrans.Voucher          = voucher;
+        #                    ledgerJournalTrans.JournalNum       = ledgerJournalTable.JournalNum;
+        #                    ledgerJournalTrans.TransDate        = str2date("1/1/2015", 213);
+        #                    ledgerJournalTrans.AccountNum       = ledgerTrans.AccountNum;
+        #                    ledgerJournalTrans.Txt              = strfmt("%1 %2 %3 %4",
+        #                                                            ledgerTrans.Txt,
+        #                                                            ledgerTrans.Voucher,
+        #                                                            ledgerTrans.JournalNum,
+        #                                                            ledgerTrans.TransDate);
+        #                    ledgerJournalTrans.CurrencyCode     = "USD";
+        #                    ledgerJournalTrans.AmountCurDebit   = ledgerTrans.AmountMST > 0 ^ reverseAmounts    ? abs(ledgerTrans.AmountMST) : 0;  //  Amount > 0 XOR reverseAmounts
+        #                    ledgerJournalTrans.AmountCurCredit  = !(ledgerTrans.AmountMST > 0 ^ reverseAmounts) ? abs(ledgerTrans.AmountMST) : 0;  //!(Amount > 0 XOR reverseAmounts)
+        #                    ledgerJournalTrans.AccountType      = LedgerJournalACType::Ledger;
+        #                    ledgerJournalTrans.Dimension        = ledgerTrans.Dimension;
+        #                    ledgerJournalTrans.insert();
+        #                    copy.writeLog(strfmt("Line for $%1 in %2 created", ledgerJournalTrans.AmountCurDebit - ledgerJournalTrans.AmountCurCredit, ledgerJournalTable.JournalNum), "Journal Line");
+        #                    progress.incCount(1, 1);
+        #                    progress.incCount(1, 2);
+        #                }
+        #            }
+        #        }
+        #        ttscommit;
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #dialog
+        #protected Object dialog(DialogRunbase dialog, boolean forceOnClient)
+        #{
+        #    DialogRunbase   ret     = super(dialog, forceOnClient);
+        #    DialogGroup     dlgGroup;
+        #    ;
+        #
+        #    ret.caption("Data Migration Tool");
+        #
+        #    dlgGroup = ret.addGroup("Main Parameters");
+        #    field_filePath              = ret.addFieldValue(typeid(FilenameOpen), filePath,         "Definition File");
+        #    field_logFilePath           = ret.addFieldValue(typeid(FilenameSave), logFilePath,      "Log File");
+        #    field_companySource         = ret.addFieldValue(typeid(dataAreaId),   companySource,    "Source Company");
+        #    field_companyDestin         = ret.addFieldValue(typeid(dataAreaId),   companyDestin,    "Destination Company");
+        #
+        #    dlgGroup = ret.addGroup("Transfer Parameters");
+        #    field_processItems          = ret.addField(typeid(NoYes), "Items");
+        #    field_processCustomers      = ret.addField(typeid(NoYes), "Customers");
+        #    field_processVendors        = ret.addField(typeid(NoYes), "Vendors");
+        #    field_processSalesOrders    = ret.addField(typeid(NoYes), "Sales Orders");
+        #    field_processPurchaseOrders = ret.addField(typeid(NoYes), "Purchase Orders");
+        #    field_processQuotes         = ret.addField(typeid(NoYes), "Quotes");
+        #    field_createGeneralJournal  = ret.addField(typeid(NoYes), "EOY General Journals");
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #getExcelWorksheetData
+        #private SysExcelCells getExcelWorksheetData(str worksheetName)
+        #{
+        #    SysExcelWorksheet   worksheet = excelWorksheets.itemFromName(worksheetName);
+        #    ;
+        #
+        #    return worksheet.cells();
+        #}
+      ENDSOURCE
+      SOURCE #getFromDialog
+        #public boolean getFromDialog()
+        #{
+        #    Filename    fp,
+        #                fn,
+        #                fe;
+        #
+        #    boolean     ret             = super();
+        #    ;
+        #
+        #    processItems            = field_processItems            .value();
+        #    processCustomers        = field_processCustomers        .value();
+        #    processVendors          = field_processVendors          .value();
+        #    processSalesOrders      = field_processSalesOrders      .value();
+        #    processPurchaseOrders   = field_processPurchaseOrders   .value();
+        #    processQuotes           = field_processQuotes           .value();
+        #    createGeneralJournal    = field_createGeneralJournal    .value();
+        #
+        #    filePath                = field_filePath                .value();
+        #    logFilePath             = field_logFilePath             .value();
+        #    companySource           = field_companySource           .value();
+        #    companyDestin           = field_companyDestin           .value();
+        #
+        #    [fp, fn, fe] = Global::fileNameSplit(logFilePath);
+        #
+        #    if (!fe)
+        #    {
+        #        logFilePath += ".csv";
+        #    }
+        #
+        #    return ret;
+        #}
+      ENDSOURCE
+      SOURCE #loadExcelWorkbook
+        #private void loadExcelWorkbook()
+        #{
+        #    SysExcelWorkbooks       xlWorkbooks;
+        #    SysExcelWorkbook        xlWorkbook;
+        #    ;
+        #
+        #    excelApplication    = SysExcelApplication::construct();
+        #    xlWorkbooks         = excelApplication.workbooks();
+        #    xlWorkbooks.open(filePath, 0, true);
+        #
+        #    xlWorkbook          = xlWorkbooks.item(1);
+        #    excelWorksheets     = xlWorkbook.worksheets();
+        #
+        #
+        #    if (processVendors && this.worksheetExists(#VendorSheetName))
+        #    {
+        #        vendorCount = this.countWorksheetItems(#VendorSheetName);
+        #        totalCount += vendorCount;
+        #        moduleCount++;
+        #    }
+        #    if (processCustomers && this.worksheetExists(#CustomerSheetName))
+        #    {
+        #        customerCount = this.countWorksheetItems(#CustomerSheetName);
+        #        totalCount += customerCount;
+        #        moduleCount++;
+        #    }
+        #    if (processItems && this.worksheetExists(#ItemSheetName))
+        #    {
+        #        itemCount = this.countWorksheetItems(#ItemSheetName);
+        #        totalCount += itemCount;
+        #        moduleCount++;
+        #    }
+        #    if (processSalesOrders && this.worksheetExists(#SalesOrderSheetName))
+        #    {
+        #        salesOrderCount = this.countWorksheetItems(#SalesOrderSheetName);
+        #        totalCount += salesOrderCount;
+        #        moduleCount++;
+        #    }
+        #    if (processPurchaseOrders && this.worksheetExists(#PurchaseOrderSheetName))
+        #    {
+        #        purchaseOrderCount = this.countWorksheetItems(#PurchaseOrderSheetName);
+        #        totalCount += purchaseOrderCount;
+        #        moduleCount++;
+        #    }
+        #    if (processQuotes && this.worksheetExists(#QuoteSheetName))
+        #    {
+        #        quoteCount = this.countWorksheetItems(#QuoteSheetName);
+        #        totalCount += quoteCount;
+        #        moduleCount++;
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #pack
+        #public container pack()
+        #{
+        #    return [#CurrentVersion,#CurrentList];
+        #}
+      ENDSOURCE
+      SOURCE #run
+        #public void run()
+        #{
+        #    int             countCheck;
+        #    LedgerTrans     ledgerTrans;
+        #    #AviFiles
+        #
+        #    void processError(str module)
+        #    {
+        #        str msg = strfmt("'%1' worksheet not found in supported file", module);
+        #        ;
+        #
+        #        error(msg);
+        #        copy.writeLog(msg, "Core", "Error");
+        #    }
+        #    ;
+        #
+        #    super();
+        #
+        #    /*
+        #        Vendors     must be processed before Purchase Orders
+        #        Vendors     must be processed before Items
+        #        Items       must be processed before Sales Orders
+        #        Items       must be processed before Purchase Orders
+        #        Items       must be processed before Quotes
+        #        Customers   must be processed before Sales Orders
+        #        Customers   must be processed before Quotes
+        #    */
+        #
+        #    this.loadExcelWorkbook();
+        #    copy = new DataCopy(companySource, companyDestin, logFilePath);
+        #
+        #    this.progressInit("Migrating Data", totalCount, #AviFileCopy, 2);
+        #
+        #    changecompany(companySource)
+        #    {
+        #        if (processVendors)
+        #        {
+        #            copy.parmCurrentModule(#VendorSheetName);
+        #            if (this.worksheetExists(#VendorSheetName))
+        #            {
+        #                countCheck += vendorCount;
+        #                progress.setText(#VendorSheetName, 1);
+        #                progress.setCount(0, 2);
+        #                progress.setTotal(vendorCount, 2);
+        #                this.transferVendors();
+        #            }
+        #            else
+        #                processError(#VendorSheetName);
+        #        }
+        #        progress.setCount(countCheck, 1);
+        #        if (processCustomers)
+        #        {
+        #            copy.parmCurrentModule(#CustomerSheetName);
+        #            if (this.worksheetExists(#CustomerSheetName))
+        #            {
+        #                countCheck += customerCount;
+        #                progress.setText(#CustomerSheetName, 1);
+        #                progress.setCount(0, 2);
+        #                progress.setTotal(customerCount, 2);
+        #                this.transferCustomers();
+        #            }
+        #            else
+        #                processError(#CustomerSheetName);
+        #        }
+        #        progress.setCount(countCheck, 1);
+        #        if (processItems)
+        #        {
+        #            copy.parmCurrentModule(#ItemSheetName);
+        #            if (this.worksheetExists(#ItemSheetName))
+        #            {
+        #                countcheck += itemCount;
+        #                progress.setText(#ItemSheetName, 1);
+        #                progress.setCount(0, 2);
+        #                progress.setTotal(itemCount, 2);
+        #                this.transferItems();
+        #            }
+        #            else
+        #                processError(#ItemSheetName);
+        #        }
+        #        progress.setCount(countCheck, 1);
+        #        if (processSalesOrders)
+        #        {
+        #            copy.parmCurrentModule(#SalesOrderSheetName);
+        #            if (this.worksheetExists(#SalesOrderSheetName))
+        #            {
+        #                countCheck += salesOrderCount;
+        #                progress.setText(#SalesOrderSheetName, 1);
+        #                progress.setCount(0, 2);
+        #                progress.setTotal(salesOrderCount, 2);
+        #                this.transferSalesOrders();
+        #            }
+        #            else
+        #                processError(#SalesOrderSheetName);
+        #        }
+        #        progress.setCount(countCheck, 1);
+        #        if (processPurchaseOrders)
+        #        {
+        #            copy.parmCurrentModule(#PurchaseOrderSheetName);
+        #            if (this.worksheetExists(#PurchaseOrderSheetName))
+        #            {
+        #                countCheck += purchaseOrderCount;
+        #                progress.setText(#PurchaseOrderSheetName, 1);
+        #                progress.setCount(0, 2);
+        #                progress.setTotal(purchaseOrderCount, 2);
+        #                this.transferPurchaseOrders();
+        #            }
+        #            else
+        #                processError(#PurchaseOrderSheetName);
+        #        }
+        #        progress.setCount(countCheck, 1);
+        #        if (processQuotes)
+        #        {
+        #            copy.parmCurrentModule(#QuoteSheetName);
+        #            if (this.worksheetExists(#QuoteSheetName))
+        #            {
+        #                countCheck += quoteCount;
+        #                progress.setText(#QuoteSheetName, 1);
+        #                progress.setCount(0, 2);
+        #                progress.setTotal(quoteCount, 2);
+        #                this.transferQuotes();
+        #            }
+        #            else
+        #                processError(#QuoteSheetName);
+        #        }
+        #        progress.setCount(countCheck, 1);
+        #    }
+        #    if (createGeneralJournal)
+        #    {
+        #        copy.parmCurrentModule("Journal");
+        #        changecompany(companySource)
+        #        {
+        #            select count(RecId)
+        #                from ledgerTrans;
+        #        }
+        #        this.progressInit("Creating Journal Entry", ledgerTrans.RecId * 2, #AviFileCopy, 2);
+        #        progress.setText(strfmt("%1 Journal", companyDestin), 1);
+        #        progress.setTotal(ledgerTrans.RecId, 2);
+        #        this.createJournalEntry(companySource, companyDestin, false);
+        #        progress.setCount(ledgerTrans.RecId, 1);
+        #        progress.setCount(0, 2);
+        #        progress.setText(strfmt("%1 Journal", companySource), 1);
+        #        this.createJournalEntry(companySource, companySource, true);
+        #    }
+        #
+        #
+        #    excelApplication.displayAlerts(false);
+        #    excelApplication.quit();
+        #}
+      ENDSOURCE
+      SOURCE #transferCustomers
+        #private void transferCustomers()
+        #{
+        #    CustTable           custTable;
+        #    SysExcelCells       excelData   = this.getExcelWorksheetData(#CustomerSheetName);
+        #    COMVariantType      comType;
+        #    int                 currentRow;
+        #    CustAccount         custAccount;
+        #    ;
+        #
+        #    try
+        #    {
+        #        ttsbegin;
+        #        do
+        #        {
+        #            currentRow++;
+        #
+        #            custAccount = excelData.item(currentRow, 1).value().bStr();
+        #
+        #            progress.setText(strfmt("%1/%2 - %3", currentRow, customerCount, custAccount), 2);
+        #
+        #            custTable = CustTable::find(custAccount);
+        #            if (custTable)
+        #            {
+        #                changecompany(companyDestin)
+        #                {
+        #                    if (!CustTable::exist(custAccount))
+        #                    {
+        #                        copy.custTable(custTable);
+        #                    }
+        #                    else
+        #                    {
+        #                        copy.writeLog(strfmt("Skipping Customer %1 - Already exists", custAccount), "Customer", "Warning");
+        #                    }
+        #                }
+        #            }
+        #            else
+        #            {
+        #                copy.writeLog(strfmt("Skipping Customer %1 - Not found", custAccount), "Customer", "Warning");
+        #            }
+        #            progress.incCount(1, 1);
+        #            progress.incCount(1, 2);
+        #
+        #            comType = excelData.item(currentRow + 1, 1).value().variantType();
+        #        }
+        #        while (comType != #EOF);
+        #        ttscommit;
+        #
+        #        copy.writeLog(strfmt("%1 Customers processed.", currentRow), "Core");
+        #    }
+        #    catch
+        #    {
+        #        copy.writeLog(strfmt("Error processing Customers (failure processing %1)", custAccount), "Core", "Error");
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #transferItems
+        #private void transferItems()
+        #{
+        #    InventTable         inventTable;
+        #    SysExcelCells       excelData   = this.getExcelWorksheetData(#ItemSheetName);
+        #    COMVariantType      comType;
+        #    int                 currentRow;
+        #    ItemId              itemId;
+        #    ;
+        #
+        #    try
+        #    {
+        #        ttsbegin;
+        #        do
+        #        {
+        #            currentRow++;
+        #
+        #            itemId = excelData.item(currentRow, 1).value().bStr();
+        #
+        #            progress.setText(strfmt("%1/%2 - %3", currentRow, itemCount, itemId), 2);
+        #
+        #            inventTable = InventTable::find(itemId);
+        #            if (inventTable)
+        #            {
+        #                changecompany(companyDestin)
+        #                {
+        #                    if (!InventTable::find(itemId))
+        #                    {
+        #                        copy.inventTable(inventTable);
+        #                    }
+        #                    else
+        #                    {
+        #                        copy.writeLog(strfmt("Skipping Item %1 - Already exists", itemId), "Item", "Warning");
+        #                    }
+        #                }
+        #            }
+        #            else
+        #            {
+        #                copy.writeLog(strfmt("Skipping Item %1 - Not found", itemId), "Item", "Warning");
+        #            }
+        #            progress.incCount(1, 1);
+        #            progress.incCount(1, 2);
+        #
+        #            comType = excelData.item(currentRow + 1, 1).value().variantType();
+        #        }
+        #        while (comType != #EOF);
+        #        ttscommit;
+        #
+        #        copy.writeLog(strfmt("%1 Items processed.", currentRow), "Core");
+        #    }
+        #    catch
+        #    {
+        #        copy.writeLog(strfmt("Error processing Items (failure processing %1)", itemId), "Core", "Error");
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #transferPurchaseOrders
+        #private void transferPurchaseOrders()
+        #{
+        #    PurchTable          purchTable;
+        #    SysExcelCells       excelData   = this.getExcelWorksheetData(#PurchaseOrderSheetName);
+        #    COMVariantType      comType;
+        #    int                 currentRow;
+        #    PurchId             purchId;
+        #    ;
+        #
+        #    try
+        #    {
+        #        ttsbegin;
+        #        do
+        #        {
+        #            currentRow++;
+        #
+        #            purchId = excelData.item(currentRow, 1).value().bStr();
+        #
+        #            progress.setText(strfmt("%1/%2 - %3", currentRow, purchaseOrderCount, purchId), 2);
+        #
+        #            purchTable = PurchTable::find(purchId);
+        #            if (purchTable)
+        #            {
+        #                changecompany(companyDestin)
+        #                {
+        #                    if (!PurchTable::find(purchId))
+        #                    {
+        #                        copy.purchTable(purchTable);
+        #                    }
+        #                    else
+        #                    {
+        #                        copy.writeLog(strfmt("Skipping Purchase Order %1 - Already exists", purchId), "Purchase Order", "Warning");
+        #                    }
+        #                }
+        #            }
+        #            else
+        #            {
+        #                copy.writeLog(strfmt("Skipping Purchase Order %1 - Not found", purchId), "Purchase Order", "Warning");
+        #            }
+        #            progress.incCount(1, 1);
+        #            progress.incCount(1, 2);
+        #
+        #            comType = excelData.item(currentRow + 1, 1).value().variantType();
+        #        }
+        #        while (comType != #EOF);
+        #        ttscommit;
+        #
+        #        copy.writeLog(strfmt("%1 Purchase Orders processed.", currentRow), "Core");
+        #    }
+        #    catch
+        #    {
+        #        copy.writeLog(strfmt("Error processing Purchase Orders (failure processing %1)", purchId), "Core", "Error");
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #transferQuotes
+        #private void transferQuotes()
+        #{
+        #    SalesQuotationTable     salesQuotationTable;
+        #    SysExcelCells           excelData   = this.getExcelWorksheetData(#QuoteSheetName);
+        #    COMVariantType          comType;
+        #    int                     currentRow;
+        #    QuotationId             quotationId;
+        #    ;
+        #
+        #    try
+        #    {
+        #        ttsbegin;
+        #        do
+        #        {
+        #            currentRow++;
+        #
+        #            quotationId = excelData.item(currentRow, 1).value().bStr();
+        #
+        #            progress.setText(strfmt("%1/%2 - %3", currentRow, quoteCount, quotationId), 2);
+        #
+        #            salesQuotationTable = SalesQuotationTable::find(quotationId);
+        #            if (salesQuotationTable)
+        #            {
+        #                changecompany(companyDestin)
+        #                {
+        #                    if (!SalesQuotationTable::find(quotationId))
+        #                    {
+        #                        copy.salesQuotationTable(salesQuotationTable);
+        #                    }
+        #                    else
+        #                    {
+        #                        copy.writeLog(strfmt("Skipping Sales Quote %1 - Already exists", quotationId), "Quote", "Warning");
+        #                    }
+        #                }
+        #            }
+        #            else
+        #            {
+        #                copy.writeLog(strfmt("Skipping Sales Quote %1 - Not found", quotationId), "Quote", "Warning");
+        #            }
+        #            progress.incCount(1, 1);
+        #            progress.incCount(1, 2);
+        #
+        #            comType = excelData.item(currentRow + 1, 1).value().variantType();
+        #        }
+        #        while (comType != #EOF);
+        #        ttscommit;
+        #
+        #        copy.writeLog(strfmt("%1 Sales Quotes processed.", currentRow), "Core");
+        #    }
+        #    catch
+        #    {
+        #        copy.writeLog(strfmt("Error processing Sales Quotes (failure processing %1)", quotationId), "Core", "Error");
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #transferSalesOrders
+        #private void transferSalesOrders()
+        #{
+        #    SalesTable          salesTable;
+        #    SysExcelCells       excelData   = this.getExcelWorksheetData(#SalesOrderSheetName);
+        #    COMVariantType      comType;
+        #    int                 currentRow;
+        #    SalesId             salesId;
+        #    ;
+        #
+        #    try
+        #    {
+        #        ttsbegin;
+        #        do
+        #        {
+        #            currentRow++;
+        #
+        #            salesId = excelData.item(currentRow, 1).value().bStr();
+        #
+        #            progress.setText(strfmt("%1/%2 - %3", currentRow, salesOrderCount, salesId), 2);
+        #
+        #            salesTable = SalesTable::find(salesId);
+        #            if (salesTable)
+        #            {
+        #                changecompany(companyDestin)
+        #                {
+        #                    if (!SalesTable::find(salesId))
+        #                    {
+        #                        copy.salesTable(salesTable);
+        #                    }
+        #                    else
+        #                    {
+        #                        copy.writeLog(strfmt("Skipping Sales Order %1 - Already exists", salesId), "Sales Order", "Warning");
+        #                    }
+        #                }
+        #            }
+        #            else
+        #            {
+        #                copy.writeLog(strfmt("Skipping Sales Order %1 - Not found", salesId), "Sales Order", "Warning");
+        #            }
+        #            progress.incCount(1, 1);
+        #            progress.incCount(1, 2);
+        #
+        #            comType = excelData.item(currentRow + 1, 1).value().variantType();
+        #        }
+        #        while (comType != #EOF);
+        #        ttscommit;
+        #
+        #        copy.writeLog(strfmt("%1 Sales Orders processed.", currentRow), "Core");
+        #    }
+        #    catch
+        #    {
+        #        copy.writeLog(strfmt("Error processing Sales Orders (failure processing %1)", salesId), "Core", "Error");
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #transferVendors
+        #private void transferVendors()
+        #{
+        #    VendTable           vendTable;
+        #    SysExcelCells       excelData   = this.getExcelWorksheetData(#VendorSheetName);
+        #    COMVariantType      comType;
+        #    int                 currentRow;
+        #    VendAccount         vendAccount;
+        #    ;
+        #
+        #    try
+        #    {
+        #        ttsbegin;
+        #        do
+        #        {
+        #            currentRow++;
+        #
+        #            vendAccount = excelData.item(currentRow, 1).value().bStr();
+        #
+        #            progress.setText(strfmt("%1/%2 - %3", currentRow, vendorCount, vendAccount), 2);
+        #
+        #            vendTable = VendTable::find(vendAccount);
+        #            if (vendTable)
+        #            {
+        #                changecompany(companyDestin)
+        #                {
+        #                    if (!VendTable::exist(vendAccount))
+        #                    {
+        #                        copy.vendTable(vendTable);
+        #                    }
+        #                    else
+        #                    {
+        #                        copy.writeLog(strfmt("Skipping Vendor %1 - Already exists", vendAccount), "Vendor", "Warning");
+        #                    }
+        #                }
+        #            }
+        #            else
+        #            {
+        #                copy.writeLog(strfmt("Skipping Vendor %1 - Not found", vendAccount), "Vendor", "Warning");
+        #            }
+        #            progress.incCount(1, 1);
+        #            progress.incCount(1, 2);
+        #
+        #            comType = excelData.item(currentRow + 1, 1).value().variantType();
+        #        }
+        #        while (comType != #EOF);
+        #        ttscommit;
+        #
+        #        copy.writeLog(strfmt("%1 Vendors processed.", currentRow), "Core");
+        #    }
+        #    catch
+        #    {
+        #        copy.writeLog(strfmt("Error processing Vendors (failure processing %1)", vendAccount), "Core", "Error");
+        #    }
+        #}
+      ENDSOURCE
+      SOURCE #unpack
+        #public boolean unpack(container packedClass)
+        #{
+        #    int version = RunBase::getVersion(packedClass);
+        #    ;
+        #
+        #    switch(version)
+        #    {
+        #        case 1:
+        #            [version, #Version1List] = packedClass;
+        #            break;
+        #        case #CurrentVersion:
+        #            [version, #CurrentList] = packedClass;
+        #            break;
+        #        default:
+        #            return false;
+        #    }
+        #
+        #    return true;
+        #
+        #}
+      ENDSOURCE
+      SOURCE #worksheetExists
+        #private boolean worksheetExists(str worksheetName)
+        #{
+        #    SysExcelWorksheet   worksheet = excelWorksheets.itemFromName(worksheetName);
+        #    ;
+        #
+        #    return worksheet != null;
+        #}
+      ENDSOURCE
+      SOURCE #main
+        #public static void main(Args args)
+        #{
+        #    DataMigrationTool   tool    = new DataMigrationTool();
+        #    ;
+        #
+        #    if (tool.prompt())
+        #    {
+        #        tool.run();
+        #    }
+        #}
+        #
+      ENDSOURCE
+    ENDMETHODS
+  ENDCLASS
+
+***Element: END

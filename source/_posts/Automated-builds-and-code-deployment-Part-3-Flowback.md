@@ -7,7 +7,6 @@ tags:
 categories:
  - AX 2009
  - Build Process
- - TeamCity
 ---
 Read the other posts in this series:
 [Why Create an AX Build Server/Process?](/2013/10/Why-create-an-AX-build-server-process)
