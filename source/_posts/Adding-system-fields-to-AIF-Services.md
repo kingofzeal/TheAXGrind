@@ -2,6 +2,7 @@ title: Adding system fields to AIF Services
 tags:
  - X++
  - Development
+date: 2015-12-23 06:00:00
 categories:
  - AX 2009
  - AIF
@@ -25,7 +26,7 @@ Within this class, we will need to create a method that matches the format `parm
 ```axapta
 public [DataType] parm[FieldName]([DataType] _[FieldName] = [DataTypeDefault])
 {
-	[Value] = _[FieldName];
+    [Value] = _[FieldName];
 
     return [Value];
 }
@@ -41,3 +42,5 @@ public UtcDateTime parmCreatedDateTime(UtcDateTime _createdDateTime = DateTimeUt
 ```
 
 You will notice that we left the assignment line of the normal method off our implementation. This is because the system fields are always readonly. This change allows someone to specify a new createdDateTime, but since the parameter is ignored, nothing will actually happen.
+
+Finally, the last step is to "publish" the changes. This is done by opening the AIF Services form (found at `Basic / Setup / Application Integration Framework / Services`) and click the 'Refresh' button and then click the 'Generate' button. This will regenerate the WDSL files for the service, which can then be updated wherever the service is used.
