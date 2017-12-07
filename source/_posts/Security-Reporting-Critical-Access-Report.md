@@ -252,9 +252,9 @@ private void writeInExcel(str text)
     column++;
 }
 
-static OES_AdminSecurityAudit construct()
+static SecurityAudit construct()
 {
-    return new OES_AdminSecurityAudit();
+    return new SecurityAudit();
 }
 
 static void main(Args args)
